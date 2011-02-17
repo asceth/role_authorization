@@ -2,32 +2,35 @@ module RoleAuthorization
   class << self
     # shortcut for <tt>enable_actionpack; enable_activerecord</tt>
     def enable
-      enable_actionpack
-      enable_activerecord
-
       # load rule mapper
       load 'role_authorization/mapper.rb'
+      load 'role_authorization/ruleset.rb'
+      load 'role_authorization/allow_group.rb'
+      load 'role_authorization/rules/basic.rb'
 
       # load default rules
       Dir.chdir(File.dirname(__FILE__)) do
-        Dir["role_authorization/rules/*.rb"].each do |rule_definition|
-          require rule_definition
+        Dir["rules/*.rb"].each do |rule_definition|
+          require "#{File.dirname(__FILE__)}/#{rule_definition}"
         end
       end
 
       # load application rules
       Dir.chdir(Rails.root) do
         Dir["lib/rules/*.rb"].each do |rule_definition|
-          require rule_definition
+          require "#{Rails.root}/#{rule_definition}"
         end
       end
 
       # load allow groups
       Dir.chdir(Rails.root) do
         Dir["lib/allow_groups/*.rb"].each do |allow_group|
-          require allow_group
+          require "#{Rails.root}/#{allow_group}"
         end
       end
+
+      enable_actionpack
+      enable_activerecord
     end
 
     def enable_actionpack
@@ -49,6 +52,8 @@ module RoleAuthorization
       unless ActiveRecord::Base.instance_methods.include? :roleable
         ActiveRecord::Base.class_eval { include Exts::Model }
       end
+
+      load 'role_authorization/exts/user.rb'
     end
 
     def load_controller_classes
