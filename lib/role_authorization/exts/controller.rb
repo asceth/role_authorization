@@ -3,7 +3,6 @@ module RoleAuthorization
     module Controller
       def self.included(base)
         base.class_eval do
-          rescue_from SecurityError, :with => proc {|e| access_denied(e)}
           helper_method :authorized?
           helper_method :accessible?
         end
