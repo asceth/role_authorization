@@ -17,7 +17,7 @@ module RoleAuthorization
       def form_for_secured(record_or_name_or_array, *args, &proc)
         options = args.last.is_a?(Hash) ? args.last : {}
 
-        url = url_for(options[:url])
+        url = url_for(options[:url] || record_or_name_or_array)
 
         method = (options[:html] && options[:html].has_key?(:method)) ? options[:html][:method] : :post
 

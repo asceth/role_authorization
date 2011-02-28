@@ -101,7 +101,7 @@ module RoleAuthorization
             return authorized_action?(self, hash[:controller], hash[:action].to_sym, hash[:id]) if hash
           rescue Exception => e
             Rails.logger.error e.inspect
-            Rails.logger.error e.backtrace
+            e.backtrace.each {|line| Rails.logger.error line }
             # continue on
           end
 
