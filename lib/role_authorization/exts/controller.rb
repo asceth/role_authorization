@@ -27,6 +27,8 @@ module RoleAuthorization
         def add_role_authorization_filter
           callbacks = _process_action_callbacks
           chain = callbacks.select {|cl| cl.klass.to_s.include?(name)}.collect(&:filter).select {|c| c.is_a?(Symbol)}
+
+          before_filter {|controller| add_role_authorization_session_values controller.current_user }
           before_filter :check_request_authorization unless chain.include?(:check_request_authorization)
         end
 
