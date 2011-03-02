@@ -109,7 +109,7 @@ module RoleAuthorization
           return true if url =~ /^mailto:/
 
           # Public file
-          file = File.join(RAILS_ROOT, 'public', url)
+          file = File.join(Rails.root, 'public', url)
           return true if File.exists?(file)
 
           # Passing in different domain
