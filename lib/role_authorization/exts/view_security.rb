@@ -1,6 +1,6 @@
 module RoleAuthorization
   module Exts
-    module View
+    module ViewSecurity
        def self.included(base)
          base.class_eval do
            alias_method :link_to_open, :link_to
@@ -28,7 +28,7 @@ module RoleAuthorization
         end
       end
 
-      def link_to_secured(name, options = {}, html_options = {})
+      def link_to_secured(name, options = {}, html_options = nil)
         url = url_for(options)
 
         method = (html_options && html_options.has_key?(:method)) ? html_options[:method] : :get
@@ -40,7 +40,7 @@ module RoleAuthorization
         end
       end
 
-      def button_to_secured(name, options = {}, html_options = {})
+      def button_to_secured(name, options = {}, html_options = nil)
         url = url_for(options)
 
         method = (html_options && html_options.has_key?(:method)) ? html_options[:method] : :post
@@ -52,26 +52,10 @@ module RoleAuthorization
         end
       end
 
-      def role(*user_roles, &block)
-        if block_given? && !session[:access_rights].blank? && !(user_roles & session[:access_rights]).empty?
-          capture_haml(&block)
-        end
-      end
-
-      def permitted_to?(url, method, &block)
-        capture_haml(&block) if block_given? && authorized?(url, method)
-      end
-
       def link_to_or_show(name, options = {}, html_options = nil)
         lnk = link_to(name, options, html_options)
         lnk.length == 0 ? name : lnk
       end
-
-      def links(*lis)
-        rvalue = []
-        lis.each{|link| rvalue << link if link.length > 0 }
-        rvalue.join(' | ')
-      end
-    end # View
+    end
   end
 end
