@@ -28,7 +28,7 @@ module RoleAuthorization
         end
       end
 
-      def link_to_secured(name, options = {}, html_options = nil)
+      def link_to_secured(name, options = {}, html_options = {})
         url = url_for(options)
 
         method = (html_options && html_options.has_key?(:method)) ? html_options[:method] : :get
@@ -40,7 +40,7 @@ module RoleAuthorization
         end
       end
 
-      def button_to_secured(name, options = {}, html_options = nil)
+      def button_to_secured(name, options = {}, html_options = {})
         url = url_for(options)
 
         method = (html_options && html_options.has_key?(:method)) ? html_options[:method] : :post
