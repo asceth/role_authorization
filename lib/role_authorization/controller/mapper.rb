@@ -39,8 +39,8 @@ module RoleAuthorization
 
       return false if rules.empty?
       return true if rules[:roles].include?(:all)
-      unless controller_instance.session[:access_rights].nil?
-        return true if !(rules[:roles] & controller_instance.session[:access_rights]).empty?
+      unless controller_instance.current_user.nil?
+        return true if !(rules[:roles] & controller_instance.current_user.roles).empty?
       end
 
       if rules.has_key?(:rules)

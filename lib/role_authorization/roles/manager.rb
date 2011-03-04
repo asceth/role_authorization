@@ -1,0 +1,86 @@
+module RoleAuthorization
+  module Roles
+    class Manager
+      attr_accessor :global_roles, :object_roles
+      attr_accessor :group_definitions, :groups
+      attr_accessor :nicknames, :creations
+      attr_accessor :klass
+
+      def initialize
+        @global_roles = {}
+        @object_roles = []
+        @groups = Hash.new
+        @creations = Hash.new
+        @nicknames = Hash.new {|hash, key| key}
+
+        self
+      end
+
+      module ClassMethods
+        def setup(klass)
+          @klass = klass
+          klass.send(:include, RoleAuthorization::Roles::Role)
+
+          # now that we know what class to use, create our role groups
+          @group_definitions.each_pair do |group_name, roles|
+            @groups[group_name.to_sym] = RoleGroup.new(klass, roles)
+          end
+        end
+      end
+      extend ClassMethods
+
+      module InstanceMethods
+        def roles(*options)
+          @global_roles, @object_roles = if options.last.is_a?(Hash)
+                                           [options.pop, options].reverse
+                                         else
+                                           [options, {}]
+                                         end
+        end
+
+        def creation_rules(rules)
+          rules.each_pair do |key, allowed_roles|
+            @creations[key] = allowed_roles.flatten.uniq
+          end
+        end
+
+        def group(groups)
+          @group_definitions = groups
+        end
+
+        def nickname(nicknames)
+          @nicknames = nicknames
+        end
+
+        def any(new_scope = nil)
+          case new_scope
+          when nil
+            [global_roles, object_roles.values].flatten
+          when :global
+            global_roles
+          else
+            object_roles[new_scope]
+          end
+        end
+
+        # make sure our defined roles are in the database
+        # remove any roles taken out
+        def persist!
+          return if klass.nil?
+
+          persisted_roles = klass.all.inject({}) {|hash, record| hash[record.name.to_sym] = record; hash}
+
+          [global_roles, object_roles.values].flatten.map do |role_name|
+            if persisted_roles.delete(role_name).nil?
+              klass.create(:name => role_name, :nickname => nicknames[role_name])
+            end
+          end
+
+          # if we have persisted roles left we delete them
+          persisted_roles.map(&:destroy)
+        end
+      end
+      include InstanceMethods
+    end
+  end
+end
