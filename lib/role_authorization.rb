@@ -7,16 +7,19 @@ require 'role_authorization/controller'
 # roles
 require 'role_authorization/roles/manager'
 require 'role_authorization/roles/role'
+require 'role_authorization/roles/role_group'
 require 'role_authorization/roles'
 
 # active record
 require 'role_authorization/active_record'
 
 # rules
-require 'role_authorization/rules/basic'
+require 'role_authorization/rules'
+require 'role_authorization/rules/rule'
+require 'role_authorization/rules/defaults'
 
 # exts
-require 'role_authorization/exts/user'
+require 'role_authorization/user'
 
 require 'rails/role_authorization' if defined?(Rails)
 

@@ -16,20 +16,17 @@ module RoleAuthorization
         self
       end
 
-      module ClassMethods
+      module InstanceMethods
         def setup(klass)
           @klass = klass
           klass.send(:include, RoleAuthorization::Roles::Role)
 
           # now that we know what class to use, create our role groups
           @group_definitions.each_pair do |group_name, roles|
-            @groups[group_name.to_sym] = RoleGroup.new(klass, roles)
+            @groups[group_name.to_sym] = RoleAuthorization::Roles::RoleGroup.new(klass, roles)
           end
         end
-      end
-      extend ClassMethods
 
-      module InstanceMethods
         def roles(*options)
           @global_roles, @object_roles = if options.last.is_a?(Hash)
                                            [options.pop, options].reverse
@@ -67,6 +64,7 @@ module RoleAuthorization
         # remove any roles taken out
         def persist!
           return if klass.nil?
+          return unless klass.new.respond_to?(:nickname)
 
           persisted_roles = klass.all.inject({}) {|hash, record| hash[record.name.to_sym] = record; hash}
 
@@ -77,7 +75,7 @@ module RoleAuthorization
           end
 
           # if we have persisted roles left we delete them
-          persisted_roles.map(&:destroy)
+          persisted_roles.values.map(&:destroy)
         end
       end
       include InstanceMethods

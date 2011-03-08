@@ -52,8 +52,9 @@ module RoleAuthorization
         ruleset = self.class.ruleset[controller]
         groups = RoleAuthorization::AllowGroup.get(self.class.allowable_groups[controller])
 
-        if defined?(DEBUG_AUTHORIZATION_RULES) == 'constant'
+        if defined?(::DEBUG_AUTHORIZATION_RULES) == 'constant'
           Rails.logger.info "#" * 30
+          Rails.logger.info controller.to_s
           Rails.logger.info ruleset.to_s
           Rails.logger.info "#" * 30
         end
@@ -77,6 +78,39 @@ module RoleAuthorization
 
         # finally deny if they haven't passed any rules
         return false
+      end
+
+      def authorized?(url, method = nil)
+        return false unless url
+        return true if admin?
+
+        method ||= (params[:method] || request.method)
+        url_parts = URI::split(url.strip)
+        path = url_parts[5]
+
+        begin
+          hash = Rails.application.routes.recognize_path(path, :method => method)
+          return authorized_action?(self, hash[:controller], hash[:action].to_sym, hash[:id]) if hash
+        rescue Exception => e
+          Rails.logger.error e.inspect
+          e.backtrace.each {|line| Rails.logger.error line }
+          # continue on
+        end
+
+        # Mailto link
+        return true if url =~ /^mailto:/
+
+        # Public file
+        file = File.join(Rails.root, 'public', url)
+        return true if File.exists?(file)
+
+        # Passing in different domain
+        return remote_url?(url_parts[2])
+      end
+
+      def remote_url?(domain = nil)
+        return false if domain.nil? || domain.strip.length == 0
+        request.host.downcase != domain.downcase
       end
     end # InstanceMethods
   end

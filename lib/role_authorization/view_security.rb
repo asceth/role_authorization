@@ -15,39 +15,6 @@ module RoleAuthorization
     end
 
     module InstanceMethods
-      def authorized?(url, method = nil)
-        return false unless url
-        return true if current_user_is_admin?
-
-        method ||= (params[:method] || request.method)
-        url_parts = URI::split(url.strip)
-        path = url_parts[5]
-
-        begin
-          hash = Rails.application.routes.recognize_path(path, :method => method)
-          return authorized_action?(self, hash[:controller], hash[:action].to_sym, hash[:id]) if hash
-        rescue Exception => e
-          Rails.logger.error e.inspect
-          e.backtrace.each {|line| Rails.logger.error line }
-          # continue on
-        end
-
-        # Mailto link
-        return true if url =~ /^mailto:/
-
-        # Public file
-        file = File.join(Rails.root, 'public', url)
-        return true if File.exists?(file)
-
-        # Passing in different domain
-        return remote_url?(url_parts[2])
-      end
-
-      def remote_url?(domain = nil)
-        return false if domain.nil? || domain.strip.length == 0
-        request.host.downcase != domain.downcase
-      end
-
       def form_for_secured(record_or_name_or_array, *args, &proc)
         options = args.last.is_a?(Hash) ? args.last : {}
 
