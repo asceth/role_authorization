@@ -34,6 +34,18 @@ module RoleAuthorization
         end
       end
 
+      def scope_ids_from(*roles)
+        (serialized_roles || {}).inject([]) do |array, (key, value)|
+          next if key == :global
+          next unless value.is_a?(Hash)
+
+          value.each_pair do |key, value|
+            array << key.to_i unless (value & roles).empty?
+          end
+          array
+        end
+      end
+
       def roles(scope = nil)
         scope, scope_id = scope_with(scope)
 
@@ -54,6 +66,10 @@ module RoleAuthorization
 
       def has_role?(role, scope = nil)
         roles(scope).include?(role)
+      end
+
+      def <<(value)
+        enroll(value)
       end
 
       # adds a role to the user
