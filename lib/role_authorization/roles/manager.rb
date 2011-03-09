@@ -1,10 +1,12 @@
 module RoleAuthorization
   module Roles
     class Manager
+      cattr_accessor :user_klass
+
       attr_accessor :global_roles, :object_roles
       attr_accessor :group_definitions, :groups
       attr_accessor :nicknames, :creations
-      attr_accessor :klass, :user_klass
+      attr_accessor :klass
 
       def initialize
         @global_roles = {}
