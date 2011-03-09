@@ -21,9 +21,9 @@ module RoleAuthorization
 
         def users(scope = nil)
           if user_ids.is_a?(Hash)
-            User.where(:id => user_ids[scope_with(scope)])
+            RoleAuthorization::Roles.manager.user_klass.where(:id => user_ids[scope_with(scope)])
           else
-            User.where(:id => user_ids)
+            RoleAuthorization::Roles.manager.user_klass.where(:id => user_ids)
           end
         end
 

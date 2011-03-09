@@ -7,6 +7,8 @@ module RoleAuthorization
       base.class_eval do
         serialize :serialized_roles
       end
+
+      RoleAuthorization::Roles.manager.user_klass = base
     end
 
     module ClassMethods

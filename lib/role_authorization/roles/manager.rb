@@ -4,7 +4,7 @@ module RoleAuthorization
       attr_accessor :global_roles, :object_roles
       attr_accessor :group_definitions, :groups
       attr_accessor :nicknames, :creations
-      attr_accessor :klass
+      attr_accessor :klass, :user_klass
 
       def initialize
         @global_roles = {}
