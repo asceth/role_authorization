@@ -93,7 +93,7 @@ module RoleAuthorization
           end
         end
 
-        if save
+        if save(:validate => false)
           RoleAuthorization::Roles.manager.klass.find_by_name(role_name).add_user(self.id, scope)
           true
         else
@@ -121,7 +121,7 @@ module RoleAuthorization
           end
         end
 
-        if save
+        if save(:validate => false)
           RoleAuthorization::Roles.manager.klass.find_by_name(role_name).remove_user(self.id, scope)
           true
         else

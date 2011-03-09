@@ -11,9 +11,17 @@ module RoleAuthorization
       end
 
       module InstanceMethods
+        def scope_with(scope)
+          if scope.is_a?(Symbol) || scope.is_a?(String) || scope.is_a?(Integer)
+            scope
+          else
+            scope.id
+          end
+        end
+
         def users(scope = nil)
           if user_ids.is_a?(Hash)
-            User.where(:id => user_ids[scope])
+            User.where(:id => user_ids[scope_with(scope)])
           else
             User.where(:id => user_ids)
           end

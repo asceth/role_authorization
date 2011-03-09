@@ -8,8 +8,8 @@ module RoleAuthorization
         @roles = roles
       end
 
-      def users
-        klass.find_all_by_name(roles).map(&:users)
+      def users(scope = nil)
+        klass.find_all_by_name(roles).map {|role| role.users(scope) }
       end
     end
   end
