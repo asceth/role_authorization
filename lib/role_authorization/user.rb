@@ -56,7 +56,11 @@ module RoleAuthorization
             array << value
           else
             if scope.nil? || (key == scope.to_sym && scope_id.nil?)
-              array << value.values
+              if value.is_a?(Hash)
+                array << value.values
+              else
+                array << value
+              end
             else
               array << value[scope_id]
             end
