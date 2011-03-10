@@ -3,7 +3,7 @@ RoleAuthorization::Rules.define :all do
 end
 
 RoleAuthorization::Rules.define :role do
-  controller_instance.current_user.roles(options[:scope] || :global).include?(options[:role])
+  controller_instance.current_user.roles(options[:scope] || :global).include?(role)
 end
 
 RoleAuthorization::Rules.define :user do
