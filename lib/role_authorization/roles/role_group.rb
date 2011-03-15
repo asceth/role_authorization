@@ -9,7 +9,7 @@ module RoleAuthorization
       end
 
       def users(scope = nil)
-        klass.find_all_by_name(roles).map {|role| role.users(scope) }
+        klass.find_all_by_name(roles).map {|role| role.users(scope) }.flatten
       end
     end
   end
