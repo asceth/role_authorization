@@ -52,17 +52,17 @@ module RoleAuthorization
         scope, scope_id = scope_with(scope)
 
         (serialized_roles || {}).inject([]) do |array, (key, value)|
-          if key == :global
-            array << value if scope.nil?
+          if key == :global && scope.nil?
+            array << value
           else
             if scope.nil? || (key == scope.to_sym && scope_id.nil?)
               if value.is_a?(Hash)
                 array << value.values
               else
-                array << value
+                array << value unless value.nil?
               end
             else
-              array << value[scope_id]
+              array << value[scope_id] unless scope_id.nil?
             end
           end
 
