@@ -52,8 +52,8 @@ module RoleAuthorization
         scope, scope_id = scope_with(scope)
 
         (serialized_roles || {}).inject([]) do |array, (key, value)|
-          if key == :global && scope.nil?
-            array << value
+          if key == :global
+            array << value if scope.nil?
           else
             if scope.nil? || (key == scope.to_sym && scope_id.nil?)
               if value.is_a?(Hash)
