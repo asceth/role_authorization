@@ -26,8 +26,12 @@ RoleAuthorization::Rules.define :user do
   else
     if options[:resource]
       check_method = options[:check] || :id
-      resource_instance = controller_instance.instance_eval(&options[:resource])
-      controller_instance.current_user.id == resource_instance.try(check_method)
+      resource_instances = controller_instance.instance_eval(&options[:resource])
+      resource_instances = [resources_instances] unless resource_instances.is_a?(Array)
+
+      resource_instances.map do |resource_instance|
+        controller_instance.current_user.id == resource_instance.try(check_method)
+      end.include?(true)
     else
       false
     end
