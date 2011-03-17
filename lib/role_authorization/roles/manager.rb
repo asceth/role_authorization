@@ -24,7 +24,7 @@ module RoleAuthorization
           klass.send(:include, RoleAuthorization::Roles::Role)
 
           # now that we know what class to use, create our role groups
-          @group_definitions.each_pair do |group_name, roles|
+          (@group_definitions || {}).each_pair do |group_name, roles|
             @groups[group_name.to_sym] = RoleAuthorization::Roles::RoleGroup.new(klass, roles)
           end
         end
