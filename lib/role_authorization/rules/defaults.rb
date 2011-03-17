@@ -3,17 +3,21 @@ RoleAuthorization::Rules.define :all do
 end
 
 RoleAuthorization::Rules.define :role do
-  scope = if options[:scope]
-            if options[:scope].is_a?(Proc)
-              instance_eval(&options[:scope])
+  if controller_instance.current_user.blank?
+    false
+  else
+    scope = if options[:scope]
+              if options[:scope].is_a?(Proc)
+                instance_eval(&options[:scope])
+              else
+                options[:scope]
+              end
             else
-              options[:scope]
+              :global
             end
-          else
-            :global
-          end
 
-  controller_instance.current_user.roles(options[:scope] || :global).include?(role)
+    controller_instance.current_user.roles(options[:scope] || :global).include?(role)
+  end
 end
 
 RoleAuthorization::Rules.define :user do
