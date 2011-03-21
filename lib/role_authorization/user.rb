@@ -117,13 +117,13 @@ module RoleAuthorization
           self.serialized_roles[:global] ||= Array.new
           self.serialized_roles[:global].delete(role_name.to_sym)
         else
-          if scope_key_id.nil?
+          if scope_id.nil?
             self.serialized_roles[scope_key] ||= Array.new
             self.serialized_roles[scope_key].delete(role_name.to_sym)
           else
             self.serialized_roles[scope_key] ||= Hash.new
-            self.serialized_roles[scope_key][scope_key_id] ||= Array.new
-            self.serialized_roles[scope_key][scope_key_id].delete(role_name.to_sym)
+            self.serialized_roles[scope_key][scope_id] ||= Array.new
+            self.serialized_roles[scope_key][scope_id].delete(role_name.to_sym)
           end
         end
 
