@@ -12,33 +12,29 @@ module RoleAuthorization
 
       module InstanceMethods
         def scope_with(scope)
-          if scope.is_a?(Symbol) || scope.is_a?(String) || scope.is_a?(Integer)
-            scope
+          if scope.blank? || scope.is_a?(Symbol) || scope.is_a?(String) || scope.is_a?(Integer)
+            scope || :all
           else
             scope.id
           end
         end
 
         def users(scope = nil)
-          if user_ids.is_a?(Hash)
-            RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids[scope_with(scope)]).all
-          else
-            RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids).all
-          end
+          RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids[scope_with(scope)]).all
         end
 
         def add_user(user_id, scope = nil)
           unserialized_user_ids = self.user_ids
+          unserialized_user_ids ||= Hash.new
 
           if scope.nil? || scope.is_a?(Symbol) || scope.is_a?(String) || scope.is_a?(Class)
-            unserialized_user_ids ||= Array.new
-            unserialized_user_ids << user_id
-            unserialized_user_ids.uniq!
+            unserialized_user_ids[scope_with(scope)] ||= Array.new
+            unserialized_user_ids[scope_with(scope)] << user_id
+            unserialized_user_ids[scope_with(scope)].uniq!
           else
-            unserialized_user_ids ||= Hash.new
-            unserialized_user_ids[scope.id] ||= Array.new
-            unserialized_user_ids[scope.id] << user_id
-            unserialized_user_ids[scope.id].uniq!
+            unserialized_user_ids[scope_with(scope)] ||= Array.new
+            unserialized_user_ids[scope_with(scope)] << user_id
+            unserialized_user_ids[scope_with(scope)].uniq!
           end
 
           self.user_ids = unserialized_user_ids
@@ -48,14 +44,14 @@ module RoleAuthorization
 
         def remove_user(user_id, scope = nil)
           unserialized_user_ids = self.user_ids
+          unserialized_user_ids ||= Hash.new
 
           if scope.nil? || scope.is_a?(Symbol) || scope.is_a?(String) || scope.is_a?(Class)
-            unserialized_user_ids ||= Array.new
-            unserialized_user_ids.delete(user_id)
+            unserialized_user_ids[scope_with(scope)] ||= Array.new
+            unserialized_user_ids[scope_with(scope)].delete(user_id)
           else
-            unserialized_user_ids ||= Hash.new
-            unserialized_user_ids[scope.id] ||= Array.new
-            unserialized_user_ids[scope.id].delete(user_id)
+            unserialized_user_ids[scope_with(scope)] ||= Array.new
+            unserialized_user_ids[scope_with(scope)].delete(user_id)
           end
 
           self.user_ids = unserialized_user_ids

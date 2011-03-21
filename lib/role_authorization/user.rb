@@ -82,20 +82,20 @@ module RoleAuthorization
       def enroll(role_name, scope = nil)
         return true if has_role?(role_name.to_sym, scope)
 
-        scope, scope_id = scope_with(scope)
+        scope_key, scope_id = scope_with(scope)
         self.serialized_roles ||= Hash.new
 
-        if scope.nil?
+        if scope_key.nil?
           self.serialized_roles[:global] ||= Array.new
           self.serialized_roles[:global] << role_name.to_sym
         else
           if scope_id.nil?
-            self.serialized_roles[scope] ||= Array.new
-            self.serialized_roles[scope] << role_name.to_sym
+            self.serialized_roles[scope_key] ||= Array.new
+            self.serialized_roles[scope_key] << role_name.to_sym
           else
-            self.serialized_roles[scope] ||= Hash.new
-            self.serialized_roles[scope][scope_id] ||= Array.new
-            self.serialized_roles[scope][scope_id] << role_name.to_sym
+            self.serialized_roles[scope_key] ||= Hash.new
+            self.serialized_roles[scope_key][scope_id] ||= Array.new
+            self.serialized_roles[scope_key][scope_id] << role_name.to_sym
           end
         end
 
@@ -110,20 +110,20 @@ module RoleAuthorization
       def withdraw(role_name, scope = nil)
         return true unless has_role?(role_name.to_sym, scope)
 
-        scope, scope_id = scope_with(scope)
+        scope_key, scope_id = scope_with(scope)
         serialized_roles ||= Hash.new
 
-        if scope.nil?
+        if scope_key.nil?
           self.serialized_roles[:global] ||= Array.new
           self.serialized_roles[:global].delete(role_name.to_sym)
         else
-          if scope_id.nil?
-            self.serialized_roles[scope] ||= Array.new
-            self.serialized_roles[scope].delete(role_name.to_sym)
+          if scope_key_id.nil?
+            self.serialized_roles[scope_key] ||= Array.new
+            self.serialized_roles[scope_key].delete(role_name.to_sym)
           else
-            self.serialized_roles[scope] ||= Hash.new
-            self.serialized_roles[scope][scope_id] ||= Array.new
-            self.serialized_roles[scope][scope_id].delete(role_name.to_sym)
+            self.serialized_roles[scope_key] ||= Hash.new
+            self.serialized_roles[scope_key][scope_key_id] ||= Array.new
+            self.serialized_roles[scope_key][scope_key_id].delete(role_name.to_sym)
           end
         end
 
