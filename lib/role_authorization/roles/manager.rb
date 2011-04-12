@@ -72,7 +72,7 @@ module RoleAuthorization
 
           [global_roles, object_roles.values].flatten.map do |role_name|
             if persisted_roles.delete(role_name).nil?
-              klass.create(:name => role_name, :nickname => nicknames[role_name])
+              klass.create(:name => role_name.to_s, :nickname => nicknames[role_name].to_s)
             end
           end
 

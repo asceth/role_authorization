@@ -47,7 +47,7 @@ module RoleAuthorization
 
       def authorized_action?(controller_klass, controller, action, id = nil)
         # by default admins see everything
-        return true if admin?
+        return true if current_user && current_user.admin?
 
         ruleset = self.class.ruleset[controller]
         groups = RoleAuthorization::AllowGroup.get(self.class.allowable_groups[controller])
@@ -82,30 +82,49 @@ module RoleAuthorization
 
       def authorized?(url, method = nil)
         return false unless url
-        return true if admin?
+        return true if current_user && current_user.admin?
 
-        method ||= (params[:method] || request.method)
-        url_parts = URI::split(url.strip)
-        path = url_parts[5]
+        unless url.is_a?(Hash)
+          method ||= (params[:method] || request.method)
+          url_parts = URI::split(url.strip)
+          path = url_parts[5]
+        end
 
         begin
-          hash = Rails.application.routes.recognize_path(path, :method => method)
-          return authorized_action?(self, hash[:controller], hash[:action].to_sym, hash[:id]) if hash
+          hash = if url.is_a?(Hash)
+                   url
+                 else
+                   Rails.application.routes.recognize_path(path, :method => method)
+                 end
+
+          if hash
+            controller_klass = if self.controller_name == hash[:controller]
+                                 self
+                               else
+                                 klass = (hash[:controller].camelize + "Controller").constantize.new
+                                 klass.params = hash
+                                 klass
+                               end
+
+            return authorized_action?(controller_klass, hash[:controller], hash[:action].to_sym, hash[:id])
+          end
         rescue Exception => e
           Rails.logger.error e.inspect
           e.backtrace.each {|line| Rails.logger.error line }
           # continue on
         end
 
-        # Mailto link
-        return true if url =~ /^mailto:/
+        unless url.is_a?(Hash)
+          # Mailto link
+          return true if url =~ /^mailto:/
 
-        # Public file
-        file = File.join(Rails.root, 'public', url)
-        return true if File.exists?(file)
+          # Public file
+          file = File.join(Rails.root, 'public', url)
+          return true if File.exists?(file)
 
-        # Passing in different domain
-        return remote_url?(url_parts[2])
+          # Passing in different domain
+          return remote_url?(url_parts[2])
+        end
       end
 
       def remote_url?(domain = nil)

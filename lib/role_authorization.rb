@@ -49,11 +49,9 @@ module RoleAuthorization
     end
 
     def enable_view_security
-      if RoleAuthorization.view_security
-        require 'role_authorization/view_security'
-        unless ActionView::Base.instance_methods.include? :link_to_or_show
-          ActionView::Base.class_eval { include RoleAuthorization::ViewSecurity }
-        end
+      require 'role_authorization/view_security'
+      unless ActionView::Base.instance_methods.include? :link_to_or_show
+        ActionView::Base.class_eval { include RoleAuthorization::ViewSecurity }
       end
     end
   end
