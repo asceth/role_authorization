@@ -20,7 +20,25 @@ module RoleAuthorization
 
         url = url_for(options[:url] || record_or_name_or_array)
 
-        method = (options[:html] && options[:html].has_key?(:method)) ? options[:html][:method] : :post
+        # pretty much taken from form_for to figure out
+        # the correct method to use
+        object = case record_or_name_or_array
+                 when String, Symbol
+                   nil
+                 when Array
+                   record_or_name_or_array.last
+                 else
+                   record_or_name_or_array
+                 end
+        object = convert_to_model(object)
+
+        method = if options[:html] && options[:html].has_key?(:method)
+                   options[:html][:method]
+                 elsif object && object.respond_to?(:persisted?) && object.persisted?
+                   :put
+                 else
+                   :post
+                 end
 
         if authorized?(url, method)
           return form_for_open(record_or_name_or_array, *args, &proc)

@@ -99,8 +99,6 @@ module RoleAuthorization
 
           if hash
             controller_klass = if self.controller_name == hash[:controller]
-                                 self
-                               else
                                  klass = (hash[:controller].camelize + "Controller").constantize.new
                                  klass.params = hash
                                  klass
@@ -110,6 +108,7 @@ module RoleAuthorization
           end
         rescue Exception => e
           Rails.logger.error e.inspect
+          Rails.logger.error "when trying to #{method} #{path}"
           e.backtrace.each {|line| Rails.logger.error line }
           # continue on
         end
