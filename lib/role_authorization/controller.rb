@@ -98,13 +98,11 @@ module RoleAuthorization
                  end
 
           if hash
-            controller_klass = if self.controller_name == hash[:controller]
-                                 klass = (hash[:controller].camelize + "Controller").constantize.new
-                                 klass.params = hash
-                                 klass
-                               end
+            klass = (hash[:controller].camelize + "Controller").constantize.new
+            klass.params = hash
+            klass.instance_variable_set(:@current_user, current_user)
 
-            return authorized_action?(controller_klass, hash[:controller], hash[:action].to_sym, hash[:id])
+            return authorized_action?(klass, hash[:controller], hash[:action].to_sym, hash[:id])
           end
         rescue Exception => e
           Rails.logger.error e.inspect
