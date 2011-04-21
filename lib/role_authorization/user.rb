@@ -4,24 +4,8 @@ module RoleAuthorization
       base.send :extend, ClassMethods
       base.send :include, InstanceMethods
 
-      if defined?(ActiveRecord::Base)
-        base.class_eval do
-          serialize :serialized_roles
-        end
-      elsif defined?(Mongoid::Attributes)
-        base.class_eval do
-          set_callback(:save, :before) do |user|
-            write_attribute(:serialized_roles, YAML.dump(@serialized_roles || {}))
-          end
-
-          def serialized_roles
-            @serialized_roles ||= (YAML.load(read_attribute(:serialized_roles).to_s) || {})
-          end
-
-          def serialized_roles=(value)
-            @serialized_roles = value
-          end
-        end
+      base.class_eval do
+        serialize :serialized_roles
       end
 
       RoleAuthorization::Roles::Manager.user_klass = base
