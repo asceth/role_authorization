@@ -48,30 +48,34 @@ module RoleAuthorization
         end
       end
 
-      def roles(scope = nil)
-        scope, scope_id = scope_with(scope)
+      def roles(scopes = nil)
+        scopes = [scopes] unless scopes.is_a? Array
 
-        (serialized_roles || {}).inject([]) do |array, (key, value)|
-          if key == :global && scope.nil?
-            array << value
-          else
-            if scope.nil? || (key == scope.to_sym && scope_id.nil?)
-              if value.is_a?(Hash)
-                array << value.values
-              else
-                array << value unless value.nil?
-              end
+        scopes.map do |scope|
+          scope, scope_id = scope_with(scope)
+
+          (serialized_roles || {}).inject([]) do |array, (key, value)|
+            if key == :global && scope.nil?
+              array << value
             else
+              if scope.nil? || (key == scope.to_sym && scope_id.nil?)
+                if value.is_a?(Hash)
+                  array << value.values
+                else
+                  array << value unless value.nil?
+                end
+              else
               array << value[scope_id] unless scope_id.nil?
+              end
             end
-          end
 
-          array
+            array
+          end
         end.flatten.uniq
       end
 
-      def has_role?(role, scope = nil)
-        roles(scope).include?(role)
+      def has_role?(role, scopes = nil)
+        roles(scopes).include?(role)
       end
 
       def <<(value)
