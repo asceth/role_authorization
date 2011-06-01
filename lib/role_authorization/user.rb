@@ -135,6 +135,17 @@ module RoleAuthorization
         end
       end
 
+      def withdraw_from_scope(scope)
+        scope_key, scope_id = scope_with(scope)
+        return true if scope_key.nil? || self.serialized_roles[scope_key].nil?
+
+        if scope_id.nil?
+          self.serialized_roles.delete(scope_key)
+        else
+          self.serialized_roles[scope_key].delete(scope_id)
+        end
+      end
+
       def admin?
         has_role?(:all, :global)
       end
