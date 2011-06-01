@@ -6,9 +6,7 @@ module RoleAuthorization
         base.send :include, InstanceMethods
         base.class_eval do
           validates_uniqueness_of :name
-          if defined?(ActiveRecord::Base)
-            serialize :user_ids
-          end
+          serialize :user_ids
         end
       end
 
