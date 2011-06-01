@@ -9,7 +9,7 @@ module RoleAuthorization
       end
 
       def get(*names)
-        ruleset.values_at(names).compact
+        ruleset.values_at(*names.flatten.compact).compact
       end
     end
   end
