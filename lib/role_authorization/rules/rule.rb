@@ -7,15 +7,10 @@ module RoleAuthorization
       # for calls to authorized?
       attr_accessor :controller_instance, :controller, :action, :id
 
-      def initialize(*options, &block)
+      def initialize(role, options, &block)
         @returning = block
-        @options, @role = if options.is_a?(Hash)
-                            [options, nil]
-                          elsif options.last.is_a?(Hash)
-                            [options.pop, options.first]
-                          else
-                            [{}, options.first]
-                          end
+        @role = role
+        @options = options
 
         self
       end
