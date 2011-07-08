@@ -15,20 +15,18 @@ module RoleAuthorization
     end
 
     module InstanceMethods
-      def form_for_secured(record_or_name_or_array, *args, &proc)
-        options = args.last.is_a?(Hash) ? args.last : {}
-
-        url = url_for(options[:url] || record_or_name_or_array)
+      def form_for_secured(record, options = {}, &proc)
+        url = url_for(options[:url] || record)
 
         # pretty much taken from form_for to figure out
         # the correct method to use
-        object = case record_or_name_or_array
+        object = case record
                  when String, Symbol
                    nil
                  when Array
-                   record_or_name_or_array.last
+                   record.last
                  else
-                   record_or_name_or_array
+                   record
                  end
         object = convert_to_model(object)
 
@@ -41,7 +39,7 @@ module RoleAuthorization
                  end
 
         if authorized?(url, method)
-          return form_for_open(record_or_name_or_array, *args, &proc)
+          return form_for_open(record, options, &proc)
         else
           return ""
         end
