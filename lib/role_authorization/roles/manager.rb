@@ -12,7 +12,7 @@ module RoleAuthorization
         @global_roles = {}
         @object_roles = []
         @groups = Hash.new
-        @creations = Hash.new
+        @creations = Hash.new(Array.new)
         @nicknames = Hash.new {|hash, key| key}
 
         self

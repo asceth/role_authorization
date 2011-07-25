@@ -72,6 +72,28 @@ module RoleAuthorization
         def group(group_name)
           RoleAuthorization::Roles.manager.groups[group_name.to_sym]
         end
+
+        def roles(scope = nil, creations = nil)
+          scoped_roles = if scope.nil? || scope.to_sym == :global
+                           RoleAuthorization::Roles.manager.global_roles
+                         else
+                           scope = if scope.is_a?(Class)
+                                     scope.class.to_s.downcase.to_sym
+                                   else
+                                     scope.to_s.downcase.to_sym
+                                   end
+
+                           RoleAuthorization::Roles.manager.object_roles[scope]
+                         end
+
+          if creation.nil?
+            scoped_roles
+          else
+            creations.map do |creation|
+              scoped_roles & RoleAuthorization::Roles.creations[creation]
+            end.flatten.uniq
+          end
+        end
       end
     end
   end
