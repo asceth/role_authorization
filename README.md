@@ -3,6 +3,15 @@ Overview
 
 Role Authorization is a gem for Rails 3.x applications that provides role based access control.
 
+* You must use the "allow {}"  method in a controller for it to filter access.  Access is based on a whitelist.  The current_user is checked against each defined rule for the action trying to be accessed and if no rules pass the user is denied.  Once on rule passes the user is given access.
+
+
+You can also enable view_security which will dynamically hide form_for, link_to and button_to outputs if the current_user does not have access to it (hide meaning not render at all).
+
+
+Usage
+-------
+
     # config/initializers/01_roles.rb
     RoleAuthorization::Roles.configure do
       roles([
