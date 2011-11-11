@@ -86,7 +86,7 @@ module RoleAuthorization
                            RoleAuthorization::Roles.manager.object_roles[scope]
                          end
 
-          if creation.nil?
+          if creations.nil?
             scoped_roles
           else
             creations.map do |creation|
