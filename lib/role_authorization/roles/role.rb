@@ -87,7 +87,7 @@ module RoleAuthorization
                          end
 
           if creations.nil?
-            scoped_roles
+            scoped_roles.flatten.uniq
           else
             creations.map do |creation|
               scoped_roles & RoleAuthorization::Roles.creations[creation]

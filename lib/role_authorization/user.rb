@@ -82,6 +82,26 @@ module RoleAuthorization
         enroll(value)
       end
 
+      # mass enroll based on scope
+      def roles=(role_names, scope = nil)
+        # first get rid of all scoped roles
+        scope_key, scope_id = scope_with(scope)
+        self.serialized_roles ||= Hash.new
+
+        if scope_key.nil?
+          self.serialized_roles[:global] = Array.new
+        else
+          if scope_id.nil?
+            self.serialized_roles[scope_key] = Array.new
+          else
+            self.serialized_roles[scope_key] ||= Hash.new
+            self.serialized_roles[scope_key][scope_id] = Array.new
+          end
+        end
+
+        role_names.map {|role_name| enroll(role_name, scope)}
+      end
+
       # adds a role to the user
       def enroll(role_name, scope = nil)
         return true if has_role?(role_name.to_sym, scope)
