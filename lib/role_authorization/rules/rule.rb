@@ -18,7 +18,13 @@ module RoleAuthorization
       def authorized?(*args)
         @controller_instance, @controller, @action, @id = args
 
-        instance_eval(&returning)
+        if instance_eval(&returning)
+          true
+        else
+          # need to run an on_fail proc?
+          controller_instance.instance_eval(&options[:on_fail]) if options[:on_fail]
+          false
+        end
       end
     end
   end

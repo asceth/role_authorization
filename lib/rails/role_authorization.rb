@@ -1,5 +1,5 @@
 module RoleAuthorization
-  class Railtie < Rails::Railtie
+  class Railtie < Rails::Engine
     initializer "role_authorization.initialize" do |app|
       RoleAuthorization.load_rules
       ::ActiveRecord::Base.send :extend, RoleAuthorization::ActiveRecord if defined?(::ActiveRecord)

@@ -18,7 +18,7 @@ module RoleAuthorization
         add_role_authorization_filter
       end
 
-      def allow(&block)
+      def allow(options = {}, &block)
         add_to_ruleset(self.controller_rule_name, &block)
         add_role_authorization_filter
       end
@@ -40,6 +40,7 @@ module RoleAuthorization
 
     module InstanceMethods
       def check_request_authorization
+        params[:role_authorization_user_data] = nil
         unless authorized_action?(self, self.class.controller_rule_name, action_name.to_sym, params[:id])
           raise SecurityError, "You do not have the required clearance to access this resource."
         end
