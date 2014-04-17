@@ -9,8 +9,8 @@ module RoleAuthorization
       attr_accessor :klass
 
       def initialize
-        @global_roles = {}
-        @object_roles = []
+        @global_roles = []
+        @object_roles = {}
         @groups = Hash.new
         @creations = Hash.new(Array.new)
         @nicknames = Hash.new {|hash, key| key}
