@@ -4,6 +4,8 @@ module RoleAuthorization
       base.class_eval do
         helper_method :authorized?
         helper_method :accessible?
+
+        before_filter :check_request_authorization
       end
       base.send :extend, RoleAuthorization::Ruleset::ClassMethods
       base.send :cattr_ruleset, :ruleset, :allowable_groups
@@ -15,18 +17,10 @@ module RoleAuthorization
     module ClassMethods
       def allow_group(*args)
         add_to_allowable_groups(self.controller_rule_name, args)
-        add_role_authorization_filter
       end
 
       def allow(options = {}, &block)
         add_to_ruleset(self.controller_rule_name, &block)
-        add_role_authorization_filter
-      end
-
-      def add_role_authorization_filter
-        callbacks = _process_action_callbacks
-        chain = callbacks.select {|cl| cl.klass.to_s.include?(name)}.collect(&:filter).select {|c| c.is_a?(Symbol)}
-        before_filter :check_request_authorization unless chain.include?(:check_request_authorization)
       end
 
       def controller_rule_name
