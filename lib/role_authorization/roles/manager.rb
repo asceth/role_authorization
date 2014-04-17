@@ -19,6 +19,11 @@ module RoleAuthorization
       end
 
       module InstanceMethods
+        def role(role_name)
+          @_role ||= {}
+          @_role[role_name] ||= klass.find_by_name(role_name)
+        end
+
         def setup(klass)
           @klass = klass
           klass.send(:include, RoleAuthorization::Roles::Role)

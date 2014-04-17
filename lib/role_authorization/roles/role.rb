@@ -20,15 +20,16 @@ module RoleAuthorization
         end
 
         def users(scope = nil)
-          if user_ids.blank?
-            []
-          else
-            if scope.nil?
-              RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids.values.flatten.uniq).all
-            else
-              RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids[scope_with(scope)]).all
-            end
-          end
+          @users ||= {}
+          @users[scope] ||= if user_ids.blank?
+                              []
+                            else
+                              if scope.nil?
+                                RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids.values.flatten.uniq).all
+                              else
+                                RoleAuthorization::Roles::Manager.user_klass.where(:id => user_ids[scope_with(scope)]).all
+                              end
+                            end
         end
 
         def add_user(user_id, scope = nil)

@@ -94,7 +94,7 @@ module RoleAuthorization
         self.serialized_roles ||= Hash.new
 
         (self.serialized_roles[:global] || []).map do |role_name|
-          RoleAuthorization::Roles.manager.klass.find_by_name(role_name).remove_user(self.id)
+          RoleAuthorization::Roles.manager.role(role_name).remove_user(self.id)
         end
         self.serialized_roles[:global] = Array.new
 
@@ -123,7 +123,7 @@ module RoleAuthorization
         end
 
         if save(:validate => false)
-          RoleAuthorization::Roles.manager.klass.find_by_name(role_name).add_user(self.id, scope)
+          RoleAuthorization::Roles.manager.role(role_name).add_user(self.id, scope)
           true
         else
           false
@@ -151,7 +151,7 @@ module RoleAuthorization
         end
 
         if save(:validate => false)
-          RoleAuthorization::Roles.manager.klass.find_by_name(role_name).remove_user(self.id, scope)
+          RoleAuthorization::Roles.manager.role(role_name).remove_user(self.id, scope)
           true
         else
           false
