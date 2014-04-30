@@ -6,7 +6,12 @@ module RoleAuthorization
         base.send :include, InstanceMethods
         base.class_eval do
           validates_uniqueness_of :name
-          serialize :user_ids
+
+          if Rails::VERSION::MAJOR >= 4
+            store :user_ids, :coder => JSON
+          else
+            serialize :user_ids
+          end
         end
       end
 
