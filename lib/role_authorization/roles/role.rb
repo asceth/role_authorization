@@ -18,7 +18,11 @@ module RoleAuthorization
       module InstanceMethods
         def unserialized_user_ids
           result = if Rails::VERSION::MAJOR >= 4
-                     self.user_ids.unserialized_value
+                     if self.user_ids.is_a?(Hash)
+                       self.user_ids
+                     else
+                       self.user_ids.unserialized_value
+                     end
                    else
                      self.user_ids
                    end

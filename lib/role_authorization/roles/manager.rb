@@ -14,11 +14,24 @@ module RoleAuthorization
         @groups = Hash.new
         @creations = Hash.new(Array.new)
         @nicknames = Hash.new {|hash, key| key}
+        @cache_user_ids = false
 
         self
       end
 
       module InstanceMethods
+        def cache_user(role_name, user_id, scope)
+          if @cache_user_ids
+            role(role_name).add_user(user_id)
+          end
+        end
+
+        def uncache_user(role_name, user_id)
+          if @cache_user_ids
+            role(role_name).remove_user(user_id)
+          end
+        end
+
         def role(role_name)
           @_role ||= {}
           @_role[role_name] ||= klass.find_by_name(role_name)
@@ -32,6 +45,10 @@ module RoleAuthorization
           (@group_definitions || {}).each_pair do |group_name, roles|
             @groups[group_name.to_sym] = RoleAuthorization::Roles::RoleGroup.new(klass, roles)
           end
+        end
+
+        def cache(value)
+          @cache_user_ids = value
         end
 
         def roles(*options)
