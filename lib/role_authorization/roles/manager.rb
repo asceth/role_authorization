@@ -20,15 +20,15 @@ module RoleAuthorization
       end
 
       module InstanceMethods
-        def cache_user(role_name, user_id, scope)
+        def cache_user(role_name, user_id, scope = nil)
           if @cache_user_ids
-            role(role_name).add_user(user_id)
+            role(role_name).add_user(user_id, scope)
           end
         end
 
-        def uncache_user(role_name, user_id)
+        def uncache_user(role_name, user_id, scope = nil)
           if @cache_user_ids
-            role(role_name).remove_user(user_id)
+            role(role_name).remove_user(user_id, scope)
           end
         end
 
