@@ -5,8 +5,13 @@ module RoleAuthorization
         helper_method :authorized?
         helper_method :accessible?
 
-        before_filter :check_request_authorization
+        if respond_to?(:before_action)
+          before_action :check_request_authorization
+        else
+          before_filter :check_request_authorization
+        end
       end
+
       base.send :extend, RoleAuthorization::Ruleset::ClassMethods
       base.send :cattr_ruleset, :ruleset, :allowable_groups
 
